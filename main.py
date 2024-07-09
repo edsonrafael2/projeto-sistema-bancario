@@ -2,83 +2,88 @@
 #Os saques não podem ser maiores de 500, e só poder ser 3 por dia.
 import os
 print()
-print('*'*25)
+print('='*25)
 print(' SISTEMA BANCARIO')
-print('*'*25)
-print()
+print('='*25)
 
-
-
-saldo = 0
-limite = 500
-extrato = dict()
-numero_saques = 0
-LIMITES_SAQUES = 3
-saque = 0
-deposito = []
-saques = []
-quant_saque = 0
-while True:
-    print()
-    menu = str(input(
-'''[ d ] - Depositar 
-[ s ] - Sacar 
-[ e ] - Extrato 
-[ q ] - Sair
-[ * ] - Digite uma opção: ''')).lower()
-    
-    if menu == 'd':
-        while 1:
-            deposito.append(int(input('Digite o valor a ser depositado: ')))
-            extrato['depositos'] = deposito
-            for i in deposito:
-                if i <= 0:
-                     print('ATENÇÃO!!!!Não é possível o deposito de valores negativos')
-                     deposito.remove(i)
-            saldo +=i               
-            res = input('\nDeseja fazer outro deposito [ Sim ] S - [ Não ] - N: ').upper()
-            if res in 'N':
-                break  
-            #saldo += i  
-    elif menu == 's':
-
-        saque = int(input('Digite o valor que você quer sacar: '))
-        if quant_saque >= LIMITES_SAQUES:
-            print('Limite de saques diarios acedido....')
-        elif saque > saldo:
-            print(f"Valor disponivel insuficiente, saldo na conta de R${saldo:.2f}")
-        elif saque > limite:
-            print(f'Limite de saque diario execedito, VALOR DIARIO é de R$:{limite:.2f}')
-        elif saque <= saldo:
-            print(f'Saque de R${saque:.2f}, efetuado com sucesso!!!')
-            quant_saque +=1
-            saldo -= saque
-            saques.append(saque)
-
+def escolha():
+        menu = str(input(
+    '''
+    [ d ] - Depositar 
+    [ s ] - Sacar 
+    [ e ] - Extrato 
+    [ q ] - Sair
+    [ * ] - Digite uma opção: ''')).lower()
         
-    elif menu == 'e':
-         os.system('clear')
-         print('='*50)
-         total_deposito = 0
-         print("Valores Depositados:")
-         for key, value in extrato.items():
-                for y in value:
-                    print(f'R$:{(y):.2f}')  
+        return menu
+    
 
-         print('Saques Efetuados: ')
-         for i in saques:
-             print(f'R$:{i:.2f}')
+def depositar(saldo,valor,extrato,/):
+        if valor > 0:
+           saldo += valor
+           extrato.append(f'Deposito R$: {valor:.2f}')
+           print('Deposito efetuado com sucesso.')
+        else:
+            print("Valor informado esta incorreto!!")
+                 
+        return saldo, extrato
 
-         print(f"Saldo Total em conta R$:{saldo:.2f}")
-         print('='*50)
+def sacar(saldo,valor,extrato,limite,saques_diarios,limite_saques_diarios,/):
+     if valor > limite:
+          print("O Valor do saque excede o limite! ")
+     elif valor > saldo:
+          print("Saldo insuficiente para saque!")
+     elif saques_diarios >= limite_saques_diarios:
+          print(" Limite de saques diarios execedido!")
+     elif valor > 0:
+          saldo -= valor
+          extrato.append(f'Saque R$: {valor:.2f}')
+          saques_diarios +=1
+          print('Saque efetuado com sucesso!!')
+     else:
+          print("ATENÇÃO!!!, o Valor informado esta incorreto.")
 
-    elif menu == 'q':
-        break
-    else:
-        print('Opção incorreta , Tente novamente!!!')
+     return saldo , extrato , saques_diarios
+          
+     
+      
+def extrato_conta(saldo,/,*,extrato):
+     os.system('clear')
+     print("="*25)
+     for i in extrato:
+         print(f'{(i)}') 
+     print("***")    
+     print(f'Saldo da conta R$:{saldo:.2f}')
+     print("="*25)
 
 
 
-print()
+def main():
+    saldo = 0
+    limite = 500
+    extrato = []
+    numero_saques = 0
+    LIMITES_SAQUES = 3
+    
+    while True:
 
+        opcao = escolha()
+        if opcao == 'd':
+             valor = int(input("Digite o valor a depositar:  "))
+             saldo,extrato=depositar(saldo,valor,extrato)
 
+        elif opcao == 's':
+             valor = int(input(" Digite o valor a ser sacado: "))
+             saldo,extrato,numero_saques = sacar(saldo,valor,extrato,limite,numero_saques,LIMITES_SAQUES)
+
+        elif opcao == 'e':
+             extrato_conta(saldo,extrato=extrato)
+             
+                        
+
+        elif opcao == 'q':
+            print('Fim do programa!!!!')
+            break
+    
+
+main()
